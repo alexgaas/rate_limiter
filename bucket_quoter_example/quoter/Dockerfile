@@ -5,12 +5,13 @@ FROM golang:1.25-alpine AS builder
 WORKDIR /app
 
 COPY go.mod go.sum ./
-RUN go mod download
+COPY vendor/ vendor/
+# RUN go mod download
 
 COPY . .
 
 # Build the Go application as a static executable
-RUN CGO_ENABLED=0 go build -ldflags='-s -w' -o quoter .
+RUN go build -mod=vendor -o quoter .
 
 # Stage 2: Production
 FROM scratch
@@ -19,6 +20,6 @@ WORKDIR /
 
 COPY --from=builder /app/quoter .
 
-EXPOSE 8080
+EXPOSE 8443
 
-CMD ["/quoter", "server", "start"]
+CMD ["./quoter", "server", "start"]
