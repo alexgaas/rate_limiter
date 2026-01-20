@@ -1,16 +1,12 @@
-#### Docker configuration for experiment:
+#### Docker (compose) configuration for experiment:
 
-- Basic **AWS** lambda image
+- Basic **AWS** lambda as rate limiter client
 - **Kong** to run a Docker based Lambda function and access it locally via Kong API Gateway to test it, 
 the same way one would normally do if the function was behind an AWS API Gateway. 
 Please see this [githib repo](https://github.com/brafales/docker-lambda-kong) with details.
-- Quoter image
+- Quoter service to count limit for any service
 
 #### Experiment:
-
-Prerequisites:
-- You need to have **Docker** installed
-- Build docker images for both **quoter** service and basic **lambda**
 
 Run simulation:
 
@@ -20,4 +16,4 @@ Run simulation:
 ```go
 curl localhost:8000 -d '{}'
 ```
-few times. First 5 times you have to get back **200 OK** but next **429** status code back (`Too Many Requests`)
+few times. First times you have to get back **200 OK** but next **429** status code back (`Too Many Requests`)
