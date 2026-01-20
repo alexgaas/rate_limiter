@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"sync"
 	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 type Core struct {
@@ -57,9 +59,10 @@ func (c *Core) Daemon() error {
 			c.g.Log.Error(fmt.Sprintf("Failed to open /dev/null, err:'%s'", err))
 			return err
 		}
-		syscall.Dup2(int(file.Fd()), int(os.Stdin.Fd()))
-		syscall.Dup2(int(file.Fd()), int(os.Stdout.Fd()))
-		syscall.Dup2(int(file.Fd()), int(os.Stderr.Fd()))
+
+		unix.Dup2(int(file.Fd()), int(os.Stdin.Fd()))
+		unix.Dup2(int(file.Fd()), int(os.Stdout.Fd()))
+		unix.Dup2(int(file.Fd()), int(os.Stderr.Fd()))
 		file.Close()
 
 		// writing pidfile

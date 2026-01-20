@@ -13,6 +13,9 @@ COPY . .
 # Build the Go application as a static executable
 RUN go build -mod=vendor -o quoter .
 
+# if you need to debug arm64 specific code
+# CMD ["tail", "-f", "/dev/null"]
+
 # Stage 2: Production
 FROM scratch
 
