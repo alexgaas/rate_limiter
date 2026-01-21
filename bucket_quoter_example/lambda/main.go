@@ -31,14 +31,24 @@ func basicHandler() (client.Response, error) {
 		client.AsService("lambda"),
 		client.WithApiSubId(conf.ApiSubKey),
 		client.WithHTTPHost(conf.LimiterHost),
+		client.WithInsecureSkipVerify(),
+		//client.WithTLSCert(conf.CaCertPath),
 	)
 	if err != nil {
-		return client.Response{}, err
+		return client.Response{
+			StatusCode: 500,
+			Headers:    map[string]string{"content-type": "application/json"},
+			Body:       err.Error(),
+		}, nil
 	}
 
 	resp, respErr := c.GetLimitResponse(context.Background())
 	if respErr != nil {
-		return client.Response{}, respErr
+		return client.Response{
+			StatusCode: 500,
+			Headers:    map[string]string{"content-type": "application/json"},
+			Body:       respErr.Error(),
+		}, nil
 	}
 
 	return *resp, nil

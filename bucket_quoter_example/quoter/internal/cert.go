@@ -35,7 +35,7 @@ func mynames() ([]string, error) {
 func GenerateMemCert(client bool, addHosts bool) ([]byte, []byte, error) {
 	privk, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to generate key: %v", err)
+		return nil, nil, fmt.Errorf("failed to generate key: %v", err)
 	}
 
 	validFrom := time.Now()
@@ -44,7 +44,7 @@ func GenerateMemCert(client bool, addHosts bool) ([]byte, []byte, error) {
 	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to generate serial number: %v", err)
+		return nil, nil, fmt.Errorf("failed to generate serial number: %v", err)
 	}
 
 	userEntry, err := user.Current()
@@ -66,8 +66,9 @@ func GenerateMemCert(client bool, addHosts bool) ([]byte, []byte, error) {
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			Organization: []string{"yandex.net"},
-			CommonName:   fmt.Sprintf("%s@%s", username, hostname),
+			// establish any org name
+			// Organization: []string{"test.net"},
+			CommonName: fmt.Sprintf("%s@%s", username, hostname),
 		},
 		NotBefore: validFrom,
 		NotAfter:  validTo,
@@ -85,7 +86,7 @@ func GenerateMemCert(client bool, addHosts bool) ([]byte, []byte, error) {
 	if addHosts {
 		hosts, err := mynames()
 		if err != nil {
-			return nil, nil, fmt.Errorf("Failed to get my hostname: %v", err)
+			return nil, nil, fmt.Errorf("failed to get my hostname: %v", err)
 		}
 
 		for _, h := range hosts {
@@ -103,7 +104,7 @@ func GenerateMemCert(client bool, addHosts bool) ([]byte, []byte, error) {
 
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privk.PublicKey, privk)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to create certificate: %v", err)
+		return nil, nil, fmt.Errorf("failed to create certificate: %v", err)
 	}
 
 	data, err := x509.MarshalECPrivateKey(privk)

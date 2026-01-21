@@ -10,6 +10,7 @@ type Config struct {
 	DryRun      bool
 	ApiSubKey   string
 	LimiterHost string
+	CaCertPath  string
 }
 
 func LoadConf() (*Config, error) {
@@ -29,9 +30,15 @@ func LoadConf() (*Config, error) {
 		return nil, fmt.Errorf("%s is not set", "LIMITER_HOST")
 	}
 
+	caCertPath := os.Getenv("CA_CERT_PATH")
+	if caCertPath == "" && !dry {
+		return nil, fmt.Errorf("%s is not set", "CA_CERT_PATH")
+	}
+
 	return &Config{
 		DryRun:      dry,
 		ApiSubKey:   apiSubIs,
 		LimiterHost: limiterHost,
+		CaCertPath:  caCertPath,
 	}, nil
 }

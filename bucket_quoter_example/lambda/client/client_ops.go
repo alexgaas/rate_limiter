@@ -1,7 +1,11 @@
 package client
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
+	"fmt"
+	"io/ioutil"
 )
 
 // HTTPClientOpt is a function that sets client behavior or basic data.
@@ -37,6 +41,32 @@ func WithApiSubId(id string) ClientOpt {
 func WithHTTPHost(host string) ClientOpt {
 	return func(c *Client) error {
 		c.httpc.SetBaseURL(host)
+		return nil
+	}
+}
+
+func WithTLSCert(caCertPath string) ClientOpt {
+	return func(c *Client) error {
+		caCert, err := ioutil.ReadFile(caCertPath)
+		if err != nil {
+			return fmt.Errorf("failed to read CA cert file: %s", caCertPath)
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
+
+		tlsConfig := &tls.Config{
+			Renegotiation: tls.RenegotiateOnceAsClient,
+			RootCAs:       caCertPool,
+		}
+
+		c.httpc.SetTLSClientConfig(tlsConfig)
+		return nil
+	}
+}
+
+func WithInsecureSkipVerify() ClientOpt {
+	return func(c *Client) error {
+		c.httpc.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 		return nil
 	}
 }

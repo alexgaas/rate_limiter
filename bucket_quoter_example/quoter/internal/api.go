@@ -66,21 +66,24 @@ func (a *Api) RunHTTPServer(mode int) error {
 		return err
 	}
 	if mode == API_HTTPS {
-		// Generating certificate and a key, we use self-signed
-		// certificates and custom header http authorization with
-		// shared secret
-		certfile := "certs/dns-api.crt"
-		keyfile := "certs/dns-api.key"
+		certfile := a.g.Opts.RateLimiter.Certfile
+		keyfile := a.g.Opts.RateLimiter.Certfile
 		port := a.g.Opts.RateLimiter.Port
 
 		if port > 0 {
 
 			a.g.Log.Debug(fmt.Sprintf("%s run http server on port:'%d'", id, port))
 
-			if err = GenCert(certfile, keyfile, false, false); err != nil {
-				a.g.Log.Debug(fmt.Sprintf("error creating a pair key+cert, for https, err:'%s'", err))
-				return err
-			}
+			// Generating certificate and a key, we use self-signed
+			// certificates and custom header http authorization with
+			// shared secret
+			/*
+				if err = GenCert(certfile, keyfile, false, false); err != nil {
+					a.g.Log.Debug(fmt.Sprintf("error creating a pair key+cert, for https, err:'%s'", err))
+					return err
+				}
+			*/
+
 			err = r.RunTLS(fmt.Sprintf(":%d", port), certfile, keyfile)
 		}
 	}

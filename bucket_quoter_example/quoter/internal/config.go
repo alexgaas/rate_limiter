@@ -26,9 +26,11 @@ type ConfYaml struct {
 }
 
 type RateLimiterSection struct {
-	Socket  string `yaml:"socket"`
-	Port    int    `yaml:"port"`
-	PidFile string `yaml:"pidFile"`
+	Socket   string `yaml:"socket"`
+	Port     int    `yaml:"port"`
+	Certfile string `yaml:"certfile"`
+	Keyfile  string `yaml:"keyfile"`
+	PidFile  string `yaml:"pidFile"`
 }
 
 type BucketsSection struct {
@@ -54,6 +56,8 @@ log:
 rateLimiter:
   socket: "/var/run/ratelimiter.socket"
   port: 8443
+  certfile: "certs/dns-api.crt"
+  keyfile: "certs/dns-api.key"
   # detach process mode: pidfile
   pidfile: "/var/run/ratelimiter.pid"
 
@@ -129,6 +133,8 @@ func LoadConf(confPath string, Overrides ConfigOverrides) (ConfYaml, error) {
 
 	conf.RateLimiter.Socket = viper.GetString("rateLimiter.socket")
 	conf.RateLimiter.Port = viper.GetInt("rateLimiter.port")
+	conf.RateLimiter.Certfile = viper.GetString("rateLimiter.certfile")
+	conf.RateLimiter.Keyfile = viper.GetString("rateLimiter.keyfile")
 	conf.RateLimiter.PidFile = viper.GetString("rateLimiter.pidFile")
 
 	var buckets = make(map[string]*BucketSettings)

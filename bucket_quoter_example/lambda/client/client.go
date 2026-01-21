@@ -50,6 +50,7 @@ func NewClient(opts ...ClientOpt) (*Client, error) {
 }
 
 func (c Client) GetLimitResponse(ctx context.Context) (*Response, error) {
+	c.httpc.SetHeader("Content-Type", "application/json")
 	req := c.httpc.R()
 
 	resp, err := req.SetContext(ctx).Get("/limiter")
@@ -64,7 +65,7 @@ func (c Client) GetLimitResponse(ctx context.Context) (*Response, error) {
 	}()
 
 	if resp.StatusCode() != http.StatusOK {
-		return nil, fmt.Errorf("laas: bad HTTP status code %d", resp.StatusCode())
+		return nil, fmt.Errorf("bad HTTP status code %d", resp.StatusCode())
 	}
 
 	var result Response

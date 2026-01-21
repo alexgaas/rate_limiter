@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY go.mod go.sum ./
 COPY vendor/ vendor/
+COPY certs/ certs/
 # RUN go mod download
 
 COPY . .
@@ -21,6 +22,7 @@ FROM scratch
 
 WORKDIR /
 
+COPY --from=builder /app/certs certs/
 COPY --from=builder /app/quoter .
 
 EXPOSE 8443
