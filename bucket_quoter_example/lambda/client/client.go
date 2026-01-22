@@ -6,13 +6,16 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 
 	"github.com/go-resty/resty/v2"
 )
 
 const (
 	DefaultHTTPHost = "https://localhost:8443"
+)
+
+var (
+	Headers = map[string]string{"content-type": "application/json; charset=utf-8"}
 )
 
 type Client struct {
@@ -38,7 +41,9 @@ func NewClientWithResty(httpc *resty.Client, opts ...ClientOpt) (*Client, error)
 	if c.httpc.HostURL == "" {
 		c.httpc.SetBaseURL(DefaultHTTPHost)
 	}
-	c.httpc.SetHeader("Host", c.httpc.HostURL)
+	for name, val := range Headers {
+		c.httpc.SetHeader(name, val)
+	}
 
 	c.httpc.SetDoNotParseResponse(true)
 
@@ -49,13 +54,12 @@ func NewClient(opts ...ClientOpt) (*Client, error) {
 	return NewClientWithResty(resty.New(), opts...)
 }
 
-func (c Client) GetLimitResponse(ctx context.Context) (*Response, error) {
-	c.httpc.SetHeader("Content-Type", "application/json")
+func (c Client) GetLimitResponse(ctx context.Context) (Response, error) {
 	req := c.httpc.R()
 
 	resp, err := req.SetContext(ctx).Get("/limiter")
 	if err != nil {
-		return nil, fmt.Errorf("lambda: %w", err)
+		return Response{}, fmt.Errorf("lambda: %w", err)
 	}
 
 	// read all and close body for proper Keep-Alive connection reuse
@@ -64,16 +68,17 @@ func (c Client) GetLimitResponse(ctx context.Context) (*Response, error) {
 		_ = resp.RawBody().Close()
 	}()
 
-	if resp.StatusCode() != http.StatusOK {
-		return nil, fmt.Errorf("bad HTTP status code %d", resp.StatusCode())
-	}
-
-	var result Response
-
+	var restyResult resty.Response
 	dec := json.NewDecoder(resp.RawBody())
-	if err := dec.Decode(&result); err != nil {
-		return nil, fmt.Errorf("lambda: %w", err)
+	if err := dec.Decode(&restyResult); err != nil {
+		return Response{}, fmt.Errorf("lambda: %w", err)
 	}
 
-	return &result, nil
+	result := Response{
+		StatusCode: resp.StatusCode(),
+		Body:       string(restyResult.Body()),
+		Headers:    Headers,
+	}
+
+	return result, nil
 }

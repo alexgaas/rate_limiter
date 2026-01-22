@@ -12,3 +12,7 @@ Test simply calling _ping_ on running docker service
 ```shell
 curl -k "https://localhost:9443/ping"
 ```
+or
+```shell
+curl -H "X-Limiter-Subscription-ID: 897d9f58-6b42-4ca7-8229-2e04056490b7" -k "https://localhost:9443/limit"
+```

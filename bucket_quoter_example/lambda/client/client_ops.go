@@ -32,7 +32,7 @@ func AsService(name string) ClientOpt {
 
 func WithApiSubId(id string) ClientOpt {
 	return func(c *Client) error {
-		c.httpc.SetHeader("X-Correlation-ID", id)
+		c.httpc.SetHeader("X-Limiter-Subscription-ID", id)
 		return nil
 	}
 }

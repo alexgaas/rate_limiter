@@ -67,14 +67,15 @@ func (a *Api) RunHTTPServer(mode int) error {
 	}
 	if mode == API_HTTPS {
 		certfile := a.g.Opts.RateLimiter.Certfile
-		keyfile := a.g.Opts.RateLimiter.Certfile
+		keyfile := a.g.Opts.RateLimiter.Keyfile
 		port := a.g.Opts.RateLimiter.Port
 
 		if port > 0 {
-
 			a.g.Log.Debug(fmt.Sprintf("%s run http server on port:'%d'", id, port))
-
 			err = r.RunTLS(fmt.Sprintf(":%d", port), certfile, keyfile)
+			if err != nil {
+				a.g.Log.Error(fmt.Sprintf("%s run failed on the port:'%d', err %s", id, port, err.Error()))
+			}
 		}
 	}
 
@@ -101,33 +102,6 @@ func (a *Api) Apiloop(wg *sync.WaitGroup, mode int) {
 
 	a.RunHTTPServer(mode)
 	return
-}
-
-func (a *Api) getPing(c *gin.Context) {
-	if a.core == nil {
-		a.apiSendError(c, 502, "Internal error")
-		return
-	}
-
-	a.apiSendOK(c, 200, "pong")
-}
-
-func (a *Api) isAPIAvailableWithLimiter(c *gin.Context) {
-	if a.core == nil {
-		a.apiSendError(c, 502, "Internal error")
-		return
-	}
-
-	if limiter, ok := a.limiterMap[c.Request.Header.Get("X-Correlation-ID")]; ok {
-		if !limiter.IsAvailable() {
-			a.apiSendError(c, 429, "Too Many Requests")
-		}
-		limiter.UseWithSleep(1)
-	} else {
-		a.apiSendError(c, 503, "Service Unavailable")
-	}
-
-	a.apiSendOK(c, 200, "")
 }
 
 func (a *Api) apiRequestLogger(c *gin.Context) {

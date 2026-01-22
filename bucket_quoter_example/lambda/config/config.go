@@ -31,9 +31,11 @@ func LoadConf() (*Config, error) {
 	}
 
 	caCertPath := os.Getenv("CA_CERT_PATH")
-	if caCertPath == "" && !dry {
-		return nil, fmt.Errorf("%s is not set", "CA_CERT_PATH")
-	}
+	/*
+		if caCertPath == "" && !dry {
+			return nil, fmt.Errorf("%s is not set", "CA_CERT_PATH")
+		}
+	*/
 
 	return &Config{
 		DryRun:      dry,
