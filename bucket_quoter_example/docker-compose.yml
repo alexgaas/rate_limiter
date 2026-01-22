@@ -1,6 +1,6 @@
 name: ratelimiter
 services:
-
+  # rate limiter server
   quoter:
     build:
       context: quoter
@@ -8,8 +8,9 @@ services:
     ports:
       - "8443:8443"
     networks:
-      - lambda-example
+      - rate-limiter
 
+  # rate limiter client
   lambda:
     environment:
       DRY_RUN: "false"
@@ -20,8 +21,9 @@ services:
       context: lambda
     container_name: lambda
     networks:
-      - lambda-example
+      - rate-limiter
 
+  # client api gateway
   kong:
     image: kong:latest
     container_name: kong
@@ -33,7 +35,18 @@ services:
     volumes:
       - ./kong:/usr/local/kong/declarative
     networks:
-      - lambda-example
+      - rate-limiter
+
+  # server metrics
+  prometheus:
+    image: prom/prometheus
+    container_name: quoter_metrics
+    volumes:
+      - "./prom/prometheus.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - rate-limiter
+    ports:
+      - "9090:9090"
 
 networks:
-  lambda-example:
+  rate-limiter:
