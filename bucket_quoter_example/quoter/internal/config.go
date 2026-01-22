@@ -109,7 +109,7 @@ func LoadConf(confPath string, Overrides ConfigOverrides) (ConfYaml, error) {
 
 	conf.Overrides = &Overrides
 
-	// logging parameters could be overriden by global
+	// logging parameters could be overridden by global
 	// command line switches
 	var LogOptions TLogOptions
 	LogOptions.Format = viper.GetString("log.format")

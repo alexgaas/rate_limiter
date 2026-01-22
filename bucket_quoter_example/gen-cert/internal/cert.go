@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
 	"time"
 )
 
@@ -148,5 +149,15 @@ func GenCert(certf string, keyf string, certtype bool, addHosts bool) error {
 	}
 	keyOut.Write(keyBytes)
 	keyOut.Close()
+	return nil
+}
+
+func GenCertKeyPair(certName, keyName string) error {
+	certFile := filepath.Join(filepath.Dir("certs/"), certName)
+	keyFile := filepath.Join(filepath.Dir("certs/"), keyName)
+
+	if err := GenCert(certFile, keyFile, false, false); err != nil {
+		return fmt.Errorf(fmt.Sprintf("error creating a pair key+cert, for https, err:'%s'", err))
+	}
 	return nil
 }

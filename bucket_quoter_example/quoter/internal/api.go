@@ -74,16 +74,6 @@ func (a *Api) RunHTTPServer(mode int) error {
 
 			a.g.Log.Debug(fmt.Sprintf("%s run http server on port:'%d'", id, port))
 
-			// Generating certificate and a key, we use self-signed
-			// certificates and custom header http authorization with
-			// shared secret
-			/*
-				if err = GenCert(certfile, keyfile, false, false); err != nil {
-					a.g.Log.Debug(fmt.Sprintf("error creating a pair key+cert, for https, err:'%s'", err))
-					return err
-				}
-			*/
-
 			err = r.RunTLS(fmt.Sprintf(":%d", port), certfile, keyfile)
 		}
 	}

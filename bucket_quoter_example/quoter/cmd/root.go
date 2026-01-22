@@ -21,8 +21,8 @@ var (
 
 	rootCmd = &cobra.Command{
 		SilenceUsage: true,
-		Use:          "ratelimiter",
-		Short:        "ratelimiter service application",
+		Use:          "quoter",
+		Short:        "quoter service application",
 		Long:         fmt.Sprintf(``),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			if InitError != nil {
@@ -44,7 +44,6 @@ func Execute() error {
 }
 
 func init() {
-	//InitConfig()
 	cobra.OnInitialize(InitConfig)
 
 	g = internal.CmdGlobal{Cmd: rootCmd, Opts: &internal.ConfYaml{}}

@@ -23,7 +23,7 @@ func (c *cmdServer) Command() *cobra.Command {
 	cmd.Use = "server --- "
 	cmd.Short = "Controlling server process"
 	cmd.Long = `Description:
-  ratelimiter service is started as a process under systemd control or as
+  quoter service is started as a process under systemd control or as
   stand-alone server process.
 `
 	cmd.PersistentFlags().BoolVarP(&c.debug, "debug", "d", false, "debug output")
