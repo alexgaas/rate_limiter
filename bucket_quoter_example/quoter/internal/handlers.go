@@ -23,10 +23,13 @@ func (a *Api) isAPIAvailableWithLimiter(c *gin.Context) {
 
 	if limiter, ok := a.limiterMap[c.Request.Header.Get("X-Limiter-Subscription-ID")]; ok {
 		if !limiter.IsAvailable() {
+			// TODO - send metrics
 			a.apiSendError(c, 429, "Too Many Requests")
+
 			return
 		}
 		limiter.UseWithSleep(1)
+		// TODO - send metrics
 	} else {
 		a.apiSendError(c, 503, "Service Unavailable")
 		return

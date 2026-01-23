@@ -2,6 +2,7 @@ package internal
 
 import (
 	"github.com/alexgaas/bucket_quoter"
+	"github.com/alexgaas/metrics/prometheus"
 
 	"encoding/json"
 	"fmt"
@@ -18,6 +19,8 @@ type Api struct {
 	core *Core
 
 	limiterMap map[string]*bucket_quoter.BucketQuoter
+
+	metrics *prometheus.Registry
 }
 
 func CreateApi(g *CmdGlobal) (*Api, error) {
@@ -25,10 +28,14 @@ func CreateApi(g *CmdGlobal) (*Api, error) {
 
 	api.g = g
 
+	// setup limiter API
 	api.limiterMap = make(map[string]*bucket_quoter.BucketQuoter)
 	for key, l := range api.g.Opts.Buckets.Buckets {
 		api.limiterMap[key] = bucket_quoter.NewBucketQuoter(int64(l.Inflow), int64(l.Capacity), false, nil)
 	}
+
+	// setup metrics
+	api.metrics = prometheus.NewRegistry(prometheus.NewRegistryOpts())
 
 	return &api, nil
 }
